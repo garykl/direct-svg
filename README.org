@@ -8,7 +8,7 @@ building dom trees.
 ** object creation
 
 Given an html-document with a container element, e.g. ~<div
-id\='content'></div>~, the following javascript snippert would create
+id='content'></div>~, the following javascript snippert would create
 a svg element containing a black circle with radius 5 px at position
 (10 px, 10 px).
 #+BEGIN_SRC javascript
@@ -22,7 +22,7 @@ svg.appendChild(circle);
 #+END_SRC
 
 The basic method for creating dom elements is =create(name, attrs)=,
-where =name= is the element descriptor, e.g. ~"circle"~, and =attrs= is an
+where =name= is the element descriptor, e.g. ~ 'circle' ~, and =attrs= is an
 object, containing all parameters that can be set by
 =domElement.setAttribute=. So the above example, internally calls
 
