@@ -5,6 +5,14 @@ creation of svg graphics. Dom objects are created and returned
 directly, such that vanilla javscript can be used for transforming and
 building dom trees.
 
+** dependency
+
+Although not exactly necessary, for convenience, the ramda library was
+used in the library and in the following code examples. It provides a
+functional interface to data structure and function manipulation
+transformations.
+
+
 ** object creation
 
 Given an html-document with a container element, e.g. ~<div
@@ -22,7 +30,7 @@ svg.appendChild(circle);
 #+END_SRC
 
 The basic method for creating dom elements is =create(name, attrs)=,
-where =name= is the element descriptor, e.g. ~ 'circle' ~, and =attrs= is an
+where =name= is the element descriptor, e.g. '=circle=', and =attrs= is an
 object, containing all parameters that can be set by
 =domElement.setAttribute=. So the above example, internally calls
 
@@ -40,3 +48,77 @@ Some more convenience functions exist, e.g. line, point, rectangle,
 group.
 
 ** object manipulation
+
+All the attributes of dom elements can be set to a new value by using
+=SVG.update(domElement, attrs)=. =attrs= is an object, whose keys are
+names of attributes and the corresponding values are the ones to be
+set.
+
+When changing geometrical properties relativ to the current values,
+like the position, the orientation or the scaling, the respective
+function =translate=, =rotate= and =scale= can be used. For setting the
+absolute values, use =setTranslation=, =setRotation=, =setScale=. Note, that
+when setting the positions via =setTranslation= to zero, only the
+position of the containing =transform= property is set to zero, not the
+actual coordinates, as in the example above.
+
+All object manipulation functions perform destructive updates,
+i.e. change the dom element provided as an argument.
+
+#+BEGIN_SRC javascript
+  var content = document.getElementById('content');
+
+  var svg = SVG.svg(500, 500);
+  content.appendChild(svg);
+
+  var rectangles = R.map(function (i) {
+      return SVG.translate(
+          SVG.rectangle(100, 10,
+                        {'fill': 'rgb(200, '+ 10 * i +', 1)'}), [100, 100]);
+      },
+      R.range(0, 25));
+
+  R.map(function (i) {
+      SVG.rotate(rectangles[i], i);
+      svg.appendChild(rectangles[i]);
+  },
+  R.range(0, 25));
+#+END_SRC
+
+** transitions
+
+The object manipulation interface can be used together with the very
+simple transition functions in =finger.js=.
+
+#+BEGIN_SRC javascript
+var content = document.getElementById('content');
+
+var svg = SVG.svg(500, 500);
+content.appendChild(svg);
+
+var circle = SVG.translate(SVG.circle(0, 0, 50, {'fill': 'rgb(200, 100, 0)'}), [150, 150]);
+svg.appendChild(circle);
+
+transition(function (i) {
+    SVG.update(circle, {'cy': i});
+},
+TransitionFunctions.sin(5, 50, 10));
+#+END_SRC
+
+An application that I like very much is, that elements vanish after an
+initial animation:
+
+#+BEGIN_SRC javascript
+svgTransition(circle, 'cx', TransitionFunctions.quickToEnd(100, 300, 100), 100,
+              function () {
+                  SVG.remove(circle);
+              });
+
+var content = document.getElementById('content');
+
+var svg = SVG.svg(500, 500);
+content.appendChild(svg);
+
+var circle = SVG.translate(SVG.circle(0, 0, 50, {'fill': 'rgb(200, 100, 0)'}), [150, 150]);
+svg.appendChild(circle);
+#+END_SRC
