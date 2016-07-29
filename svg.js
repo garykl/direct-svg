@@ -1,4 +1,4 @@
-var SVG = function () {
+var SVG = (function () {
 
     var svgns = 'http://www.w3.org/2000/svg';
 
@@ -30,10 +30,29 @@ var SVG = function () {
         return inspection(elem.attributes);
     };
 
-    var point = function(x, y, attrs) {
-        var props = {'cx': x, 'cy': y, 'r': 2};
+
+    var svg = function (width, height, attrs) {
+        var props = { 'width': width, 'height': height };
+        return create('svg', R.merge(props, attrs));
+    };
+
+
+    var foreignObject = function (x, y, width, height, attrs) {
+        var props = { requiredExtensions: "http://www.w3.org/1999/xhtml",
+                      'x': x, 'y': y,
+                      'width': width, 'height': height };
+        return create('foreignObject', R.merge(props, attrs));
+    };
+
+
+    var circle = function(x, y, radius, attrs) {
+        var props = {'cx': x, 'cy': y, 'r': radius};
         return create('circle', R.merge(props, attrs));
-    }
+    };
+
+    var point = function(x, y, attrs) {
+        return circle(x, y, 2, attrs);
+    };
 
     var line = function(r1, r2, attrs) {
         var props = {'x1': r1[0], 'x2': r2[0], 'y1': r1[1], 'y2': r2[1]}
@@ -226,10 +245,14 @@ var SVG = function () {
         update: update,
         inspect: inspectAll,
 
+        svg: svg,
+        foreignObject: foreignObject,
+
         line: line,
         polygon: polygon,
         rectangle: rectangle,
         arrow: arrow,
+        circle: circle,
         point: point,
 
         group: group,
@@ -241,4 +264,4 @@ var SVG = function () {
         setScaling: setScaling,
         setTranslation: setTranslation
     };
-};
+})();
