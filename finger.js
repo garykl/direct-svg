@@ -3,7 +3,7 @@
 var TransitionFunctions = {
     quickToEnd: function (start, end, num) {
         return function (i) {
-            return start / Math.sqrt(i)  + end;
+            return (start - end) / Math.sqrt(i)  + end;
         };
     },
     sin: function (minimum, maximum, period) {
