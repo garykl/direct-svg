@@ -198,7 +198,7 @@ var SVG = (function () {
 
     var rotate = function (elem, rotation) {
         var transformation = getTransform(elem);
-        var rotation = rotation;
+        var rotation = rotation + transformation.rotation;
         return setTransform(elem,
                             transformation.scaling,
                             transformation.translation,
