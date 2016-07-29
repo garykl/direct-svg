@@ -5,15 +5,14 @@ creation of svg graphics. Dom objects are created and returned
 directly, such that vanilla javscript can be used for transforming and
 building dom trees.
 
-** dependency
+** Dependency
 
 Although not exactly necessary, for convenience, the ramda library was
 used in the library and in the following code examples. It provides a
-functional interface to data structure and function manipulation
-transformations.
+functional interface to data structure and function manipulation.
 
 
-** object creation
+** Creation of svg dom elements
 
 Given an html-document with a container element, e.g. ~<div
 id='content'></div>~, the following javascript snippert would create
@@ -47,7 +46,7 @@ svg.appendChild(circle);
 Some more convenience functions exist, e.g. line, point, rectangle,
 group.
 
-** object manipulation
+** Manipulation of elements
 
 All the attributes of dom elements can be set to a new value by using
 =SVG.update(domElement, attrs)=. =attrs= is an object, whose keys are
@@ -57,7 +56,7 @@ set.
 When changing geometrical properties relativ to the current values,
 like the position, the orientation or the scaling, the respective
 function =translate=, =rotate= and =scale= can be used. For setting the
-absolute values, use =setTranslation=, =setRotation=, =setScale=. Note, that
+absolute values, use =setTranslation=, =setRotation=, =setScaling=. Note, that
 when setting the positions via =setTranslation= to zero, only the
 position of the containing =transform= property is set to zero, not the
 actual coordinates, as in the example above.
@@ -85,7 +84,7 @@ i.e. change the dom element provided as an argument.
   R.range(0, 25));
 #+END_SRC
 
-** transitions
+** Transitions as continuous manipulation
 
 The object manipulation interface can be used together with the very
 simple transition functions in =finger.js=.
@@ -109,11 +108,6 @@ An application that I like very much is, that elements vanish after an
 initial animation:
 
 #+BEGIN_SRC javascript
-svgTransition(circle, 'cx', TransitionFunctions.quickToEnd(100, 300, 100), 100,
-              function () {
-                  SVG.remove(circle);
-              });
-
 var content = document.getElementById('content');
 
 var svg = SVG.svg(500, 500);
@@ -121,4 +115,9 @@ content.appendChild(svg);
 
 var circle = SVG.translate(SVG.circle(0, 0, 50, {'fill': 'rgb(200, 100, 0)'}), [150, 150]);
 svg.appendChild(circle);
+
+svgTransition(circle, 'cx', TransitionFunctions.quickToEnd(100, 300, 100), 100,
+              function () {
+                  SVG.remove(circle);
+              });
 #+END_SRC
