@@ -2,11 +2,6 @@
 //
 // make all functions independent of absolute coordinates,
 // when created bring the objects geometric center to the origin.
-//
-// create composition functions: horizontal, vertical.
-// create distribution functions: horizontal, vertical.
-// distribution function may take functions as arguments for more
-// interesting distributions.
 
 
 var SVG = (function () {
@@ -56,8 +51,8 @@ var SVG = (function () {
     };
 
 
-    var text = function (x, y, msg, attrs) {
-        var props = {'x': x, 'y': y};
+    var text = function (msg, attrs) {
+        var props = {'x': 0, 'y': 0};
         var elem = create('text', R.merge(props, attrs));
         elem.innerHTML = msg;
         return elem;
@@ -80,7 +75,7 @@ var SVG = (function () {
 
     var rectangle = function (width, height, attrs) {
         var props = {
-            x: 0, y: 0,
+            x: -0.5 * width, y: -0.5 * height,
             width: width,
             height: height
         }
@@ -282,5 +277,69 @@ var SVG = (function () {
         setRotation: setRotation,
         setScaling: setScaling,
         setTranslation: setTranslation
+    };
+})();
+
+
+var Compose = (function() {
+
+    var horizontal = function (e1, e2) {
+        var bb = e1.getBoundingClientRect();
+        SVG.translate(e2, [bb.x + bb.width, 0]);
+    };
+
+    var vertical = function (e1, e2) {
+        var bb = e1.getBoundingClientRect();
+        SVG.translate(e2, [0, bb.y + bb.height]);
+    };
+
+    var distribute = function (how, elems) {
+        for (var i = 0; i < elems.length - 1; i++) {
+            how(elems[i], elems[i + 1]);
+        }
+        return elems;
+    };
+
+    return {
+
+        horizontal: horizontal,
+        vertical: vertical,
+        distribute: distribute
+
+    };
+})();
+
+
+var Arrange = (function () {
+
+    var top = function (elems) {
+        var bbs = R.map(function (e) {
+            return e.getBoundingClientRect().y;
+        }, elems);
+        var minimum = Math.min.apply(undefined, bbs);
+
+        R.map(function ([b, e]) {
+            SVG.translate(e, [0, minimum - b]);
+        }, R.zip(bbs, elems));
+
+        return elems;
+    };
+
+    var left = function (elems) {
+        var bbs = R.map(function (e) {
+            return e.getBoundingClientRect().x;
+        }, elems);
+        var minimum = Math.min.apply(undefined, bbs);
+
+        R.map(function ([b, e]) {
+            SVG.translate(e, [minimum - b, 0]);
+        }, R.zip(bbs, elems));
+
+        return elems;
+    };
+
+    return {
+        top: top,
+        left:left
     };
 })();
