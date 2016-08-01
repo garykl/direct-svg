@@ -1,3 +1,14 @@
+// TODO:
+//
+// make all functions independent of absolute coordinates,
+// when created bring the objects geometric center to the origin.
+//
+// create composition functions: horizontal, vertical.
+// create distribution functions: horizontal, vertical.
+// distribution function may take functions as arguments for more
+// interesting distributions.
+
+
 var SVG = (function () {
 
     var svgns = 'http://www.w3.org/2000/svg';
@@ -45,6 +56,13 @@ var SVG = (function () {
     };
 
 
+    var text = function (x, y, msg, attrs) {
+        var props = {'x': x, 'y': y};
+        var elem = create('text', R.merge(props, attrs));
+        elem.innerHTML = msg;
+        return elem;
+    };
+
     var circle = function(x, y, radius, attrs) {
         var props = {'cx': x, 'cy': y, 'r': radius};
         return create('circle', R.merge(props, attrs));
@@ -67,7 +85,7 @@ var SVG = (function () {
             height: height
         }
         return create('rect', R.merge(props, attrs));
-    }
+    };
 
 
     var polygon = function(points, attrs) {
@@ -81,8 +99,8 @@ var SVG = (function () {
 
 
     var group = function (elems, attrs) {
-        var g = create('g', attrs)
-            R.map(function (e) { g.appendChild(e); }, elems);
+        var g = create('g', attrs);
+        R.map(function (e) { g.appendChild(e); }, elems);
         return g;
     };
 
@@ -248,6 +266,7 @@ var SVG = (function () {
         svg: svg,
         foreignObject: foreignObject,
 
+        text: text,
         line: line,
         polygon: polygon,
         rectangle: rectangle,
