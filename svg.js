@@ -139,38 +139,97 @@ var SVG = (function () {
                 position[1] - 0.5 * vector[1] + dy]], attrs);
     };
 
+    // var getTransform = function (elem) {
+    //     var transform = elem.getAttribute('transform');
+    //     var translation = (function () {
+    //         if (/translate/.test(transform)) {
+    //             var tmp = /translate\(\s*-?\d+\s*,\s*-?\d+\s*\)/.exec(transform);
+    //             return R.map(parseInt, tmp[0].split(/[^\d+]+/).slice(1, 3));
+    //         } else {
+    //             return [0, 0];
+    //         }
+    //     })();
+    //     var rotation = (function () {
+    //         rotateOriginCheck = /rotate\(\s*\d+\s*\)/;
+    //         rotateCheck = /rotate\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/;
+    //         if (rotateOriginCheck.test(transform)) {
+    //             var tmp = rotateOriginCheck.exec(transform);
+    //             return tmp[0].split(/[^\d+]+/)[1];
+    //         //} else if (rotateCheck.test(transform)) {
+    //         //    var tmp = rotateCheck.exec(transform);
+    //         //    return tmp[0].split(/[^\d+]+/).slice(1, 4);
+    //         } else {
+    //             return 0;//[0, translation[0], translation[1]];
+    //         }
+    //     })();
+    //     var scaling = (function () {
+    //         if (/scale/.test(transform)) {
+    //             var tmp = /scale\(\s*\d+\s*\)/.exec(transform);
+    //             return parseInt(tmp[0].split(/[^\d+]+/)[1]);
+    //         } else {
+    //             return 1;
+    //         }
+    //     })();
+
+    //     return {
+    //         translation: translation,
+    //         rotation: rotation,
+    //         scaling: scaling
+    //     }
+    // };
+
+    // var setTransform = function (elem, scaling, translation, rotation) {
+
+    //     var translationString = 'translate('
+    //                           + Math.round(translation[0]) +','
+    //                           + Math.round(translation[1]) +')';
+    //     var rotationString = 'rotate(';
+    //     var scalingString = 'scale('+ Math.round(scaling) +')';
+    //     if (Array.isArray(rotate)) {
+    //         rotationString += Math.round(rotation[0]) +','+ Math.round(rotation[1]) +',';
+    //         rotationString += Math.round(rotation[2]) + ')';
+    //     } else {
+    //         rotationString += Math.round(rotation) + ')';
+    //     }
+
+    //     var transformString = translationString + ',';
+    //     transformString += rotationString + ',';
+    //     transformString += scalingString;
+    //     return update(elem, {'transform': transformString});
+    // };
+
     var getTransform = function (elem) {
         var transform = elem.getAttribute('transform');
         var translation = (function () {
             if (/translate/.test(transform)) {
-                var tmp = /translate\(\s*-?\d+\s*,\s*-?\d+\s*\)/.exec(transform);
-                return R.map(parseInt, tmp[0].split(/[^\d+]+/).slice(1, 3));
+                var tmp = /translate\(\s*-?\d+\s*-?\d+\s*\)/.exec(transform);
+                var h = tmp[0].split(/[^\d+]+/).slice(1, 3);
+                return [parseInt(h[0]), parseInt(h[1])];
             } else {
                 return [0, 0];
             }
         })();
         var rotation = (function () {
-            rotateOriginCheck = /rotate\(\s*\d+\s*\)/;
-            rotateCheck = /rotate\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/;
+            rotateOriginCheck = /rotate\(\s*[\d+]\s*\)/;
             if (rotateOriginCheck.test(transform)) {
                 var tmp = rotateOriginCheck.exec(transform);
                 return tmp[0].split(/[^\d+]+/)[1];
-            //} else if (rotateCheck.test(transform)) {
-            //    var tmp = rotateCheck.exec(transform);
-            //    return tmp[0].split(/[^\d+]+/).slice(1, 4);
+                //} else if (rotateCheck.test(transform)) {
+                //    var tmp = rotateCheck.exec(transform);
+                //    return tmp[0].split(/[^\d+]+/).slice(1, 4);
             } else {
                 return 0;//[0, translation[0], translation[1]];
             }
         })();
         var scaling = (function () {
             if (/scale/.test(transform)) {
-                var tmp = /scale\(\s*\d+\s*\)/.exec(transform);
-                return parseInt(tmp[0].split(/[^\d+]+/)[1]);
+                var tmp = /scale\(\s*\d+\.?\d*\s*\d+\.?\d*\s*\)/.exec(transform);
+                var h = tmp[0].split(/[^\d+\.?\d*]+/).slice(1, 3);
+                return [h[0], h[1]];
             } else {
                 return 1;
             }
         })();
-
         return {
             translation: translation,
             rotation: rotation,
@@ -181,28 +240,28 @@ var SVG = (function () {
     var setTransform = function (elem, scaling, translation, rotation) {
 
         var translationString = 'translate('
-                              + Math.round(translation[0]) +','
-                              + Math.round(translation[1]) +')';
+        + Math.round(translation[0]) +' '
+        + Math.round(translation[1]) +')';
         var rotationString = 'rotate(';
-        var scalingString = 'scale('+ Math.round(scaling) +')';
-        if (Array.isArray(rotate)) {
-            rotationString += Math.round(rotation[0]) +','+ Math.round(rotation[1]) +',';
+        var scalingString = 'scale('+ scaling[0] + ' ' + scaling[1] + ')';
+        if (Array.isArray(rotation)) {
+            rotationString += Math.round(rotation[0]) +' '+ Math.round(rotation[1]) +' ';
             rotationString += Math.round(rotation[2]) + ')';
         } else {
             rotationString += Math.round(rotation) + ')';
         }
 
-        var transformString = translationString + ',';
-        transformString += rotationString + ',';
+        var transformString = translationString + ' ';
+        transformString += rotationString + ' ';
         transformString += scalingString;
-        return update(elem, {'transform': transformString});
+        elem.setAttribute('transform', transformString);
     };
 
     var translate = function (elem, translation) {
         var transformation = getTransform(elem);
         var translation = R.zipWith(R.add,
                                     transformation.translation,
-                                    translation);
+        translation);
         return setTransform(elem,
                             transformation.scaling,
                             translation,
